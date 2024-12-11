@@ -32,7 +32,6 @@ app.listen(PORT, () => {
 DBConnect();
 
 
-
 // api welcome check
 app.get('/', async (req, res) => {
     try {
@@ -45,4 +44,4 @@ app.get('/', async (req, res) => {
   });
 
 // adding the routing file
-// app.use('/v1', router);
+app.use('/v1', router);
