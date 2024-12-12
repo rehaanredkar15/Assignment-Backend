@@ -2,7 +2,7 @@ const User = require('../model/user-model.js');
 
 const getUsersData = async () => {
   try {
-      const users = await User.find().select('name email role kycDetails');
+    const users = await User.find({ role: { $ne: 'admin' } }).select('name email role kycDetails');
       const totalUsers = users.length;
       const approvedKYCs = users.filter(user => user.kycDetails.status === 'accepted').length;
       const pendingKYCs = users.filter(user => user.kycDetails.status === 'pending').length;
