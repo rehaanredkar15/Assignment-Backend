@@ -1,12 +1,23 @@
 const User = require('../model/user-model.js');
 
 const getUsersData = async () => {
-    try {
-        const users = await User.find().select('name email role kycDetails.status');
-        return users;
-    } catch (err) {
-        throw new Error('Error fetching users: ' + err.message);
-    }
+  try {
+      const users = await User.find().select('name email role kycDetails');
+      const totalUsers = users.length;
+      const approvedKYCs = users.filter(user => user.kycDetails.status === 'accepted').length;
+      const pendingKYCs = users.filter(user => user.kycDetails.status === 'pending').length;
+      const rejectedKYCs = users.filter(user => user.kycDetails.status === 'rejected').length;
+
+      return {
+          totalUsers,
+          approvedKYCs,
+          pendingKYCs,
+          rejectedKYCs,
+          users
+      };
+  } catch (err) {
+      throw new Error('Error fetching users: ' + err.message);
+  }
 };
 
 const updateUserKycDetails = async (userId, updates) => {

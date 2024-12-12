@@ -12,7 +12,9 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const user = new User({ ...req.body, password: hashedPassword });
         await user.save();
-        res.status(201).json({ message: 'User registered successfully' });
+        const { password, ...userData } = user._doc;
+
+        res.status(201).json({ message: 'User registered successfully',user:userData });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -24,7 +26,12 @@ const loginUser = async (req, res) => {
         return res.status(401).json({ message: 'Invalid credentials' });
     }
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+    const { password, ...userData } = user._doc;
+
+    res.json({
+        token,
+        user: userData
+    });
 };
 
 const uploadKycFile = async (req, res) => {

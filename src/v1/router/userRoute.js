@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
   });
 const upload = multer({ storage: storage });
 
-router.post('/upload-kyc', upload.single('kycFile'), uploadKycFile);
 //Protected Route
+router.post('/upload-kyc', authenticateToken,upload.single('kycFile'), uploadKycFile);
 
 module.exports = router;
