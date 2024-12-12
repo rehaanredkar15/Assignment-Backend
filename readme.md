@@ -34,5 +34,6 @@ https://github.com/rehaanredkar15/Assignment-Backend.git
 ### 4. After Installing run the following command to start the application
   npm run start
 
-
-
+## Notes:
+1) The Database used here was Mongodb Atlas and its a cloud database so connected over internet
+2) The Kyc Documents are uploaded on Cloudinary and saved there
