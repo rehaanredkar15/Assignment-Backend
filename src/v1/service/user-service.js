@@ -1,13 +1,56 @@
 const User = require('../model/user-model.js');
+const fs = require('fs');
+const cloudinary = require('../../../config/cloudinary.config.js');
 
-// Service function to fetch all users with their KYC statuses
-const getUsersData = async () => {
+const uploadAndSaveKycDetails = async (filePath, email,name) => {
     try {
-        const users = await User.find().select('name email role kycDetails.status');
-        return users;
-    } catch (err) {
-        throw new Error('Error fetching users: ' + err.message);
+      // Upload file to Cloudinary
+      const result = await cloudinary.uploader.upload(filePath, {
+        resource_type: 'auto',
+      });
+  
+      // Deleting local file
+      fs.unlinkSync(filePath);
+  
+      const updatedUser = await User.findOneAndUpdate(
+        { email },
+        {  
+           name:name, 
+           email:email,
+          'kycDetails.documentPath': result.url, 
+          'kycDetails.status': 'pending' 
+        },
+        { new: true } 
+      );
+  
+      if (!updatedUser) {
+        throw new Error('User not found');
+      }
+  
+      return updatedUser;
+    } catch (error) {
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      throw new Error(`Error in uploadAndSaveKycDetails: ${error.message}`);
     }
 };
 
-module.exports = { getUsersData };
+
+const getUserDetails = async ({ userId, email }) => {
+    try {
+      const query = {};
+      if (userId) query._id = userId;
+      if (email) query.email = email;
+  
+      const user = await User.findOne(query);
+  
+      return user;
+    } catch (error) {
+      console.error('Error in getUserDetails service:', error);
+      throw new Error('Failed to fetch user details.');
+    }
+  };
+
+  
+module.exports = { uploadAndSaveKycDetails,getUserDetails };

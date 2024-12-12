@@ -1,27 +1,23 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const User = require('../model/user-model');
 
-// Function to generate the access and refresh token
 const generateToken = async (user) => {
     try {
-        // Verify if the user exists (simplified check, you can enhance this logic)
         const foundUser = await User.findOne({ email: user.email });
         if (!foundUser) {
             return { success: false, message: 'User not found' };
         }
 
-        // Generate access token
         const accessToken = jwt.sign(
             { id: foundUser._id, role: foundUser.role },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }  // Access token expiry in 1 hour
+            { expiresIn: '1h' }  
         );
 
-        // Generate refresh token
         const refreshToken = jwt.sign(
             { id: foundUser._id, role: foundUser.role },
             process.env.JWT_REFRESH_SECRET,
-            { expiresIn: '7d' }  // Refresh token expiry in 7 days
+            { expiresIn: '7d' } 
         );
 
         return { success: true, token: accessToken }; 
